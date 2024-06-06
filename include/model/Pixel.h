@@ -11,6 +11,7 @@ typedef struct _pixel_ {
 } pixel;
 
 double distance(pixel pixel1, pixel pixel2);
-pixel read_image(MLV_Image *image, int startX, int startY, int width, int height);
+pixel read_image(MLV_Image *image, int startX, int startY, int size);
+MLV_Color to_MLV_Color(pixel pixel);
 
 #endif
