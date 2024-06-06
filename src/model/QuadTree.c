@@ -21,3 +21,4 @@ quadnode *create_quadnode(MLV_Image *image, int startX, int startY, int width, i
     node->northwest = node->northeast = node->southwest = node->southeast = NULL;
     return node;
 }
+

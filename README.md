@@ -49,7 +49,7 @@ La vue gère l'affichage graphique de l'image et les interactions avec l'utilisa
 
 # NEXT STEP
 
-1. Tâches binaires pour le max
+1. Tas binaires pour le max
 2. Charger une image en QuadTree
 3. Ajouter des fonctionnalités pour l'encodage et le décodage des images en utilisant des quadtrees
 4. Implémenter des boutons dans l'interface pour :
