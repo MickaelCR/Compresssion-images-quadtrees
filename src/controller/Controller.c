@@ -23,22 +23,25 @@ void process_image(const char *filename) {
     subdivide(tree, image, heap);
 
     // Subdiviser les nœuds en utilisant le tas max pour trouver l'erreur maximale
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 100; i++) {
         quadnode *max_error_node = extract_max(heap);
         if (max_error_node && max_error_node->size > 1) { // Assurez-vous de ne pas subdiviser les nœuds de taille 1x1
             subdivide(max_error_node, image, heap);
-            draw_quadtree(tree); // Redessiner le quadtree après chaque subdivision
+            
         }
+        if(i % 10 == 0) draw_quadtree(tree); // Redessiner le quadtree après chaque subdivision
     }
 
-    // // Sauvegarder le quadtree
-    // save_quadtree(tree, "result.qtc");
+    // Sauvegarder le quadtree
+    save_quadtree(tree, "result.qtc");
 
-    // // Charger le quadtree depuis le fichier
-    // tree = load_quadtree("result.qtc");
-
-    // Afficher le quadtree chargé
-    draw_quadtree(tree);
+    // Charger le quadtree depuis le fichier
+    quadnode *loaded_tree = load_quadtree("result.qtc");
+    if (loaded_tree) {
+        // Afficher le quadtree chargé
+        draw_quadtree(loaded_tree);
+        free(loaded_tree);
+    }
 
     // Libérer les ressources
     free_max_heap(heap);
