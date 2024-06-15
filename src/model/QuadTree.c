@@ -97,8 +97,10 @@ void assign_ids(quadnode *node, int *current_id) {
 void write_minimized_node_to_file(quadnode *node, FILE *fptr) {
     if (node == NULL) return;
     if (node->northwest == NULL) {
-        fprintf(fptr, "%d %d %d %d %d %d\n", node->id, 1, node->color.red, node->color.green, node->color.blue, node->color.alpha);
+        // Node is a leaf
+        fprintf(fptr, "%df %d %d %d %d\n", node->id, node->color.red, node->color.green, node->color.blue, node->color.alpha);
     } else {
+        // Node is an internal node
         fprintf(fptr, "%d %d %d %d %d\n", node->id, node->northwest->id, node->northeast->id, node->southwest->id, node->southeast->id);
         write_minimized_node_to_file(node->northwest, fptr);
         write_minimized_node_to_file(node->northeast, fptr);
@@ -106,7 +108,6 @@ void write_minimized_node_to_file(quadnode *node, FILE *fptr) {
         write_minimized_node_to_file(node->southeast, fptr);
     }
 }
-
 void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, int isBW) {
     *buffer <<= 1;
     *bufferSize += 1;
