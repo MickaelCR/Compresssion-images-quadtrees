@@ -4,23 +4,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void process_image(const char *filename) {
-    initialize_window();
-    MLV_Image *image = MLV_load_image(filename);
-    if (!image) {
-        fprintf(stderr, "Could not load image %s\n", filename);
-        return;
-    }
-
+void process_image(MLV_Image *image) {
     // Créer le tas max
     max_heap *heap = create_max_heap(1000);
 
     // Créer l'arbre quadtree
     quadnode *tree = create_quadnode(image, 0, 0, 512, heap);
     printf("Initial color=(%d %d %d %d), error=%f\n", tree->color.red, tree->color.green, tree->color.blue, tree->color.alpha, tree->error);
-
-    // Subdiviser initialement le nœud racine
-    // subdivide(tree, image, heap);
 
     // Subdiviser les nœuds en utilisant le tas max pour trouver l'erreur maximale
     for (int i = 0; i < 10000; i++) {
@@ -31,24 +21,20 @@ void process_image(const char *filename) {
         }
     }
 
-    // // Sauvegarder le quadtree
-    free_max_heap(heap);
-    heap = create_max_heap(1000);
+    // Sauvegarder le quadtree
     save_quadtree(tree, "result.qtc");
 
-    // // Charger le quadtree depuis le fichier
-    tree = load_quadtree("result.qtc", heap);
+    // Charger le quadtree depuis le fichier
+    tree = load_quadtree("result.qtc");
     minimise_quadtree(tree);
     draw_quadtree(tree);
     sleep(3);
 
-    tree = load_minimised_quadtree("result_minimized.qtc", heap, 0);
+    tree = load_minimised_quadtree("test", 1);
     draw_quadtree(tree);
     sleep(3);    
 
     // Libérer les ressources
     free_max_heap(heap);
     free_quadnode(tree);
-    MLV_free_image(image);
-    free_window();
 }

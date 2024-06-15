@@ -19,18 +19,16 @@ double calculate_error(MLV_Image *image, int startX, int startY, int size, pixel
 
 quadnode *create_quadnode(MLV_Image *image, int x, int y, int size, max_heap *heap) {
     quadnode *node = malloc(sizeof(quadnode));
-    if (image != NULL) {
-        node->color = read_image(image, x, y, size);
-        node->error = calculate_error(image, x, y, size, node->color);
-    }
     node->northwest = node->northeast = node->southwest = node->southeast = NULL;
     node->x = x;
     node->y = y;
     node->size = size;
-
-    // Ajouter le nœud au tas max
-    insert_max_heap(heap, node);
-
+    if (image != NULL) {
+        node->color = read_image(image, x, y, size);
+        node->error = calculate_error(image, x, y, size, node->color);
+        // Ajouter le nœud au tas max
+        insert_max_heap(heap, node);
+    }
     return node;
 }
 
@@ -63,6 +61,10 @@ void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buff
         *buffer += ((long long) (node->color.blue)%256) << 16;
         *buffer += ((long long) (node->color.green)%256) << 8;
         *buffer += ((long long) (node->color.alpha)%256);
+
+        /**buffer <<= 1;
+        *bufferSize++;
+        if ((color.red+color.blue+color.green)/3%128) *buffer++;*/
     }
     while (*bufferSize >= 8) {
         *bufferSize -= 8;
@@ -87,7 +89,7 @@ void save_quadtree(quadnode *tree, char *filename) {
     fclose(fptr);
 }
 
-void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap) {
+void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize) {
     if (*bufferSize == 0) {
         *buffer = fgetc(fptr);
         *bufferSize += 8;
@@ -108,23 +110,23 @@ void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buf
         node->color = current;
         *bufferSize -= 32;
     } else {
-        node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, heap);
-        node->northeast = create_quadnode(NULL, node->x+node->size/2, node->y, node->size/2, heap);
-        node->southwest = create_quadnode(NULL, node->x, node->y+node->size/2, node->size/2, heap);
-        node->southeast = create_quadnode(NULL, node->x+node->size/2, node->y+node->size/2, node->size/2, heap);
-        read_node_from_file(node->northwest, fptr, buffer, bufferSize, heap);
-        read_node_from_file(node->northeast, fptr, buffer, bufferSize, heap);
-        read_node_from_file(node->southwest, fptr, buffer, bufferSize, heap);
-        read_node_from_file(node->southeast, fptr, buffer, bufferSize, heap);
+        node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, NULL);
+        node->northeast = create_quadnode(NULL, node->x+node->size/2, node->y, node->size/2, NULL);
+        node->southwest = create_quadnode(NULL, node->x, node->y+node->size/2, node->size/2, NULL);
+        node->southeast = create_quadnode(NULL, node->x+node->size/2, node->y+node->size/2, node->size/2, NULL);
+        read_node_from_file(node->northwest, fptr, buffer, bufferSize);
+        read_node_from_file(node->northeast, fptr, buffer, bufferSize);
+        read_node_from_file(node->southwest, fptr, buffer, bufferSize);
+        read_node_from_file(node->southeast, fptr, buffer, bufferSize);
     }
 }
 
-quadnode *load_quadtree(char *filename, max_heap *heap) {
+quadnode *load_quadtree(char *filename) {
     FILE *fptr = fopen(filename, "r");
     unsigned long long int buffer = 0;
     int bufferSize = 0;
-    quadnode *tree = create_quadnode(NULL, 0, 0, 512, heap);
-    read_node_from_file(tree, fptr, &buffer, &bufferSize, heap);
+    quadnode *tree = create_quadnode(NULL, 0, 0, 512, NULL);
+    read_node_from_file(tree, fptr, &buffer, &bufferSize);
     fclose(fptr);
     return tree;
 }
@@ -150,7 +152,7 @@ void minimise_quadtree(quadnode *tree) {
     }
 }
 
-void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, max_heap *heap, int blackAndWhite) {
+void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, int blackAndWhite) {
     rewind(fptr);
     char *line = NULL;
     size_t len;
@@ -161,20 +163,20 @@ void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, ma
         int scanned = sscanf(line, "%d%c%d %d %d %d", &currentIndex, &afterNumber, &(currentPixel.red), &(currentPixel.green), &(currentPixel.blue), &(currentPixel.alpha));
         if (currentIndex == nodeIndex) {
             if ((!blackAndWhite && afterNumber == ' ') || (blackAndWhite && scanned==6)) {
-                node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, heap);
-                node->northeast = create_quadnode(NULL, node->x+node->size/2, node->y, node->size/2, heap);
-                node->southwest = create_quadnode(NULL, node->x, node->y+node->size/2, node->size/2, heap);
-                node->southeast = create_quadnode(NULL, node->x+node->size/2, node->y+node->size/2, node->size/2, heap);
-                read_minimised_node_from_file(node->northwest, fptr, currentPixel.red, heap, blackAndWhite);
-                read_minimised_node_from_file(node->northeast, fptr, currentPixel.green, heap, blackAndWhite);
-                read_minimised_node_from_file(node->southwest, fptr, currentPixel.blue, heap, blackAndWhite);
-                read_minimised_node_from_file(node->southeast, fptr, currentPixel.alpha, heap, blackAndWhite);
+                node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, NULL);
+                node->northeast = create_quadnode(NULL, node->x+node->size/2, node->y, node->size/2, NULL);
+                node->southwest = create_quadnode(NULL, node->x, node->y+node->size/2, node->size/2, NULL);
+                node->southeast = create_quadnode(NULL, node->x+node->size/2, node->y+node->size/2, node->size/2, NULL);
+                read_minimised_node_from_file(node->northwest, fptr, currentPixel.red, blackAndWhite);
+                read_minimised_node_from_file(node->northeast, fptr, currentPixel.green, blackAndWhite);
+                read_minimised_node_from_file(node->southwest, fptr, currentPixel.blue, blackAndWhite);
+                read_minimised_node_from_file(node->southeast, fptr, currentPixel.alpha, blackAndWhite);
             } else if (!blackAndWhite && afterNumber == 'f') {
                 node->color = currentPixel;
             } else if (blackAndWhite && scanned == 3) {
-                currentPixel.blue = currentPixel.red*255;
-                currentPixel.green = currentPixel.red*255;
-                currentPixel.red = currentPixel.red*255;
+                currentPixel.red *= 255;
+                currentPixel.green = currentPixel.red;
+                currentPixel.blue = currentPixel.red;
                 currentPixel.alpha = 255;
                 node->color = currentPixel;
             }
@@ -183,10 +185,10 @@ void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, ma
     }
 }
 
-quadnode *load_minimised_quadtree(char *filename, max_heap *heap, int blackAndWhite) {
+quadnode *load_minimised_quadtree(char *filename, int blackAndWhite) {
     FILE *fptr = fopen(filename, "r");
-    quadnode *tree = create_quadnode(NULL, 0, 0, 512, heap);
-    read_minimised_node_from_file(tree, fptr, 0, heap, blackAndWhite);
+    quadnode *tree = create_quadnode(NULL, 0, 0, 512, NULL);
+    read_minimised_node_from_file(tree, fptr, 0, blackAndWhite);
     fclose(fptr);
     return tree;
 }

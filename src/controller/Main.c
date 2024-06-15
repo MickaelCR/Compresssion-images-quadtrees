@@ -5,7 +5,24 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <image_file>\n", argv[0]);
         return 1;
     }
+    initialize_window();
+    draw_interface_buttons();
+    MLV_Image *image = load_image(argv[1]);
+    draw_image(image);
+    update_window();
 
-    process_image(argv[1]);
+    int clickX, clickY;
+    int buttonIndex = -1;
+    while (buttonIndex != 7) {
+        MLV_wait_mouse(&clickX, &clickY);
+        buttonIndex = clickX/128 + 4*((clickY-512)/50);
+        switch (buttonIndex) {
+            case 0:
+                process_image(image);
+                break;
+        }
+    }
+    MLV_free_image(image);
+    free_window();
     return 0;
 }
