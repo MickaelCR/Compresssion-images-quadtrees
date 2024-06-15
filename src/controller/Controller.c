@@ -38,6 +38,7 @@ void process_image(const char *filename) {
 
     // // Charger le quadtree depuis le fichier
     tree = load_quadtree("result.qtc", heap);
+    minimise_quadtree(tree);
     draw_quadtree(tree);
     sleep(3);
 

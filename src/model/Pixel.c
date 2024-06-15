@@ -9,6 +9,10 @@ double distance(pixel pixel1, pixel pixel2) {
                 (pixel1.alpha - pixel2.alpha) * (pixel1.alpha - pixel2.alpha));
 }
 
+int equal_pixels(pixel pixel1, pixel pixel2) {
+    return pixel1.red==pixel2.red && pixel1.blue==pixel2.blue && pixel1.green==pixel2.green && pixel1.alpha==pixel2.alpha;
+}
+
 pixel read_image(MLV_Image *image, int startX, int startY, int size) {
     pixel current, final = {0, 0, 0, 0};
     int pixelCount = size * size;

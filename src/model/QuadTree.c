@@ -127,3 +127,23 @@ quadnode *load_quadtree(char *filename, max_heap *heap) {
     fclose(fptr);
     return tree;
 }
+
+void minimise_quadtree(quadnode *tree) {
+    if (tree == NULL || tree->northwest == NULL) return;
+    minimise_quadtree(tree->northwest);
+    minimise_quadtree(tree->northeast);
+    minimise_quadtree(tree->southwest);
+    minimise_quadtree(tree->southeast);
+    if (equal_pixels(tree->northwest->color, tree->northeast->color) &&
+        equal_pixels(tree->northwest->color, tree->southwest->color) &&
+        equal_pixels(tree->northwest->color, tree->southeast->color)) {
+        free_quadnode(tree->northwest);
+        free_quadnode(tree->northeast);
+        free_quadnode(tree->southwest);
+        free_quadnode(tree->southeast);
+        tree->northwest = NULL;
+        tree->northeast = NULL;
+        tree->southwest = NULL;
+        tree->southeast = NULL;
+    }
+}

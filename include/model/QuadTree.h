@@ -24,5 +24,6 @@ void subdivide(quadnode *node, MLV_Image *image, max_heap *heap);
 quadnode *find_max_error(quadnode *node);
 void save_quadtree(quadnode *tree, char *filename);
 quadnode *load_quadtree(char *filename, max_heap *heap);
+void minimise_quadtree(quadnode *tree);
 
 #endif
