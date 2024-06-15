@@ -1,5 +1,6 @@
 #include "../../include/model/QuadTree.h"
 #include "../../include/model/Heap.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 
@@ -156,6 +157,7 @@ void minimise_quadtree(quadnode *tree) {
     if (equal_pixels(tree->northwest->color, tree->northeast->color) &&
         equal_pixels(tree->northwest->color, tree->southwest->color) &&
         equal_pixels(tree->northwest->color, tree->southeast->color)) {
+        tree->color = tree->northwest->color;
         free_quadnode(tree->northwest);
         free_quadnode(tree->northeast);
         free_quadnode(tree->southwest);
@@ -165,4 +167,45 @@ void minimise_quadtree(quadnode *tree) {
         tree->southwest = NULL;
         tree->southeast = NULL;
     }
+}
+
+void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, max_heap *heap, int blackAndWhite) {
+    rewind(fptr);
+    char *line = NULL;
+    size_t len;
+    int currentIndex;
+    char afterNumber;
+    pixel currentPixel = {0, 0, 0, 0};
+    while (getline(&line, &len, fptr) != -1) {
+        int scanned = sscanf(line, "%d%c%d %d %d %d", &currentIndex, &afterNumber, &(currentPixel.red), &(currentPixel.green), &(currentPixel.blue), &(currentPixel.alpha));
+        if (currentIndex == nodeIndex) {
+            if ((!blackAndWhite && afterNumber == ' ') || (blackAndWhite && scanned==6)) {
+                node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, heap);
+                node->northeast = create_quadnode(NULL, node->x+node->size/2, node->y, node->size/2, heap);
+                node->southwest = create_quadnode(NULL, node->x, node->y+node->size/2, node->size/2, heap);
+                node->southeast = create_quadnode(NULL, node->x+node->size/2, node->y+node->size/2, node->size/2, heap);
+                read_minimised_node_from_file(node->northwest, fptr, currentPixel.red, heap, blackAndWhite);
+                read_minimised_node_from_file(node->northeast, fptr, currentPixel.green, heap, blackAndWhite);
+                read_minimised_node_from_file(node->southwest, fptr, currentPixel.blue, heap, blackAndWhite);
+                read_minimised_node_from_file(node->southeast, fptr, currentPixel.alpha, heap, blackAndWhite);
+            } else if (!blackAndWhite && afterNumber == 'f') {
+                node->color = currentPixel;
+            } else if (blackAndWhite && scanned == 3) {
+                currentPixel.blue = currentPixel.red*255;
+                currentPixel.green = currentPixel.red*255;
+                currentPixel.red = currentPixel.red*255;
+                currentPixel.alpha = 255;
+                node->color = currentPixel;
+            }
+            break;
+        }
+    }
+}
+
+quadnode *load_minimised_quadtree(char *filename, max_heap *heap, int blackAndWhite) {
+    FILE *fptr = fopen(filename, "r");
+    quadnode *tree = create_quadnode(NULL, 0, 0, 512, heap);
+    read_minimised_node_from_file(tree, fptr, 0, heap, blackAndWhite);
+    fclose(fptr);
+    return tree;
 }

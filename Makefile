@@ -6,7 +6,7 @@ VIEW_DIR = view/
 CONTR_DIR = controller/
 
 CC = gcc
-CFLAGS = -Wall -std=c99 -I$(INC_DIR)
+CFLAGS = -Wall -I$(INC_DIR)
 LDFLAGS = -lm -lMLV
 
 OBJ = $(BIN_DIR)Main.o $(BIN_DIR)Pixel.o $(BIN_DIR)QuadTree.o $(BIN_DIR)View.o $(BIN_DIR)Controller.o $(BIN_DIR)Heap.o

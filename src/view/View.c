@@ -7,6 +7,10 @@ void initialize_window() {
     MLV_create_window("Quadtree", "", 512, 612);
 }
 
+void draw_interface_buttons() {
+	MLV_draw_adapted_text_box(0, 512, "Lancer l'approximation", 5, MLV_COLOR_BLACK, MLV_COLOR_BLACK, MLV_COLOR_WHITE, MLV_TEXT_CENTER);
+}
+
 void draw_image(MLV_Image *image) {
     MLV_draw_image(image, 0, 0);
 }

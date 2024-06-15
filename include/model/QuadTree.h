@@ -27,5 +27,6 @@ void save_quadtree(quadnode *tree, const char *filename, int isBW);
 void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap, int isBW);
 quadnode *load_quadtree(const char *filename, max_heap *heap, int isBW);
 void minimise_quadtree(quadnode *tree);
+quadnode *load_minimised_quadtree(char *filename, max_heap *heap, int blackAndWhite);
 
 #endif
