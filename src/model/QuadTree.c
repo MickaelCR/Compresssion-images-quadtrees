@@ -27,6 +27,7 @@ quadnode *create_quadnode(MLV_Image *image, int x, int y, int size, max_heap *he
     node->x = x;
     node->y = y;
     node->size = size;
+    node->id = -1; // Par défaut, aucun identifiant
 
     // Ajouter le nœud au tas max
     insert_max_heap(heap, node);
@@ -35,7 +36,7 @@ quadnode *create_quadnode(MLV_Image *image, int x, int y, int size, max_heap *he
 }
 
 void subdivide(quadnode *node, MLV_Image *image, max_heap *heap) {
-    if (node->size <= 1) return; // Ne subdivisez pas si le nœud est de taille 1x1
+    if (node->size <= 1) return;
 
     node->northwest = create_quadnode(image, node->x, node->y, node->size / 2, heap);
     node->northeast = create_quadnode(image, node->x + node->size / 2, node->y, node->size / 2, heap);
@@ -52,16 +53,56 @@ void free_quadnode(quadnode *node) {
     free(node);
 }
 
+
+
+void save_quadtree(quadnode *tree, const char *filename, int isBW) {
+    FILE *fptr = fopen(filename, "w");
+    unsigned long long int buffer = 0;
+    int bufferSize = 0;
+    write_node_to_file(tree, fptr, &buffer, &bufferSize, isBW);
+    if (bufferSize != 0)
+        fputc(buffer << (8-bufferSize), fptr);
+    fclose(fptr);
+}
+
+
+void assign_ids(quadnode *node, int *current_id) {
+    if (node == NULL || node->id != -1) return;
+    node->id = (*current_id)++;
+    assign_ids(node->northwest, current_id);
+    assign_ids(node->northeast, current_id);
+    assign_ids(node->southwest, current_id);
+    assign_ids(node->southeast, current_id);
+}
+
+void write_minimized_node_to_file(quadnode *node, FILE *fptr, int blackAndWhite) {
+    if (node == NULL) return;
+    if (node->northwest == NULL) {
+        // Node is a leaf
+        if(blackAndWhite)
+            fprintf(fptr, "%d %d\n", node->id, (((node->color.red + node->color.green + node->color.blue) / 3) % 128));
+        else
+            fprintf(fptr, "%df %d %d %d %d\n", node->id, node->color.red, node->color.green, node->color.blue, node->color.alpha);
+        
+    } else {
+        // Node is an internal node
+        fprintf(fptr, "%d %d %d %d %d\n", node->id, node->northwest->id, node->northeast->id, node->southwest->id, node->southeast->id);
+        write_minimized_node_to_file(node->northwest, fptr, blackAndWhite);
+        write_minimized_node_to_file(node->northeast, fptr, blackAndWhite);
+        write_minimized_node_to_file(node->southwest, fptr, blackAndWhite);
+        write_minimized_node_to_file(node->southeast, fptr, blackAndWhite);
+    }
+}
 void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, int isBW) {
     *buffer <<= 1;
     *bufferSize += 1;
     if (node->northwest == NULL) {
         *buffer += 1;
         if (isBW) {
-            *buffer <<= 8;
-            *bufferSize += 8;
+            *buffer <<= 1;
+            *bufferSize += 1;
             int grayscale = (node->color.red + node->color.green + node->color.blue) / 3;
-            *buffer += grayscale % 256;
+            *buffer += (grayscale % 256) % 128;
         } else {
             *buffer <<= 32;
             *bufferSize += 32;
@@ -84,13 +125,27 @@ void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buff
     }
 }
 
-void save_quadtree(quadnode *tree, const char *filename, int isBW) {
+void save_quadtree_unminimized(quadnode *tree, const char *filename, int isBW) {
     FILE *fptr = fopen(filename, "w");
     unsigned long long int buffer = 0;
     int bufferSize = 0;
     write_node_to_file(tree, fptr, &buffer, &bufferSize, isBW);
     if (bufferSize != 0)
         fputc(buffer << (8-bufferSize), fptr);
+    fclose(fptr);
+}
+
+void save_quadtree_minimized(quadnode *tree, const char *filename, int isBW) {
+    int current_id = 0;
+    assign_ids(tree, &current_id);
+
+    FILE *fptr = fopen(filename, "w");
+    if (!fptr) {
+        perror("Failed to open file for writing");
+        return;
+    }
+
+    write_minimized_node_to_file(tree, fptr, isBW);
     fclose(fptr);
 }
 
@@ -103,15 +158,17 @@ void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buf
     *bufferSize -= 1;
     if (is_leaf) {
         if (isBW) {
-            *buffer <<= 8;
-            *buffer += fgetc(fptr);
-            *bufferSize += 8;
-            int grayscale = (*buffer >> (*bufferSize - 8)) % 256;
+            if (*bufferSize == 0) {
+                *buffer <<= 8;
+                *buffer += fgetc(fptr);
+                *bufferSize += 8;
+            }
+            int grayscale = (*buffer >> (*bufferSize - 1));
             pixel current;
-            current.red = current.green = current.blue = grayscale;
-            current.alpha = 255; // assuming full opacity
+            current.red = current.green = current.blue = grayscale * 255;
+            current.alpha = 255;
             node->color = current;
-            *bufferSize -= 8;
+            *bufferSize -= 1;
         } else {
             for (int i = 0; i < 4; i++) {
                 *buffer <<= 8;
