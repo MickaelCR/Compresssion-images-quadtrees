@@ -22,12 +22,8 @@ quadnode *create_quadnode(MLV_Image *image, int x, int y, int size, max_heap *he
 void free_quadnode(quadnode *node);
 void subdivide(quadnode *node, MLV_Image *image, max_heap *heap);
 quadnode *find_max_error(quadnode *node);
-void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize);
-void save_quadtree(quadnode *tree, const char *filename);
-void save_quadtree_bw(quadnode *tree, const char *filename);
-void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap);
-void read_node_from_file_bw(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap);
-quadnode *load_quadtree(const char *filename, max_heap *heap);
-quadnode *load_quadtree_bw(const char *filename, max_heap *heap);
-
+void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, int isBW);
+void save_quadtree(quadnode *tree, const char *filename, int isBW);
+void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap, int isBW);
+quadnode *load_quadtree(const char *filename, max_heap *heap, int isBW);
 #endif

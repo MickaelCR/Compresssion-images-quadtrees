@@ -51,17 +51,24 @@ void free_quadnode(quadnode *node) {
     free(node);
 }
 
-void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize) {
+void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, int isBW) {
     *buffer <<= 1;
     *bufferSize += 1;
     if (node->northwest == NULL) {
         *buffer += 1;
-        *buffer <<= 32;
-        *bufferSize += 32;
-        *buffer += ((long long) (node->color.red)%256) << 24;
-        *buffer += ((long long) (node->color.blue)%256) << 16;
-        *buffer += ((long long) (node->color.green)%256) << 8;
-        *buffer += ((long long) (node->color.alpha)%256);
+        if (isBW) {
+            *buffer <<= 8;
+            *bufferSize += 8;
+            int grayscale = (node->color.red + node->color.green + node->color.blue) / 3;
+            *buffer += grayscale % 256;
+        } else {
+            *buffer <<= 32;
+            *bufferSize += 32;
+            *buffer += ((long long) (node->color.red) % 256) << 24;
+            *buffer += ((long long) (node->color.blue) % 256) << 16;
+            *buffer += ((long long) (node->color.green) % 256) << 8;
+            *buffer += ((long long) (node->color.alpha) % 256);
+        }
     }
     while (*bufferSize >= 8) {
         *bufferSize -= 8;
@@ -69,57 +76,24 @@ void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buff
         fputc(byte, fptr);
     }
     if (node->northwest != NULL) {
-        write_node_to_file(node->northwest, fptr, buffer, bufferSize);
-        write_node_to_file(node->northeast, fptr, buffer, bufferSize);
-        write_node_to_file(node->southwest, fptr, buffer, bufferSize);
-        write_node_to_file(node->southeast, fptr, buffer, bufferSize);
+        write_node_to_file(node->northwest, fptr, buffer, bufferSize, isBW);
+        write_node_to_file(node->northeast, fptr, buffer, bufferSize, isBW);
+        write_node_to_file(node->southwest, fptr, buffer, bufferSize, isBW);
+        write_node_to_file(node->southeast, fptr, buffer, bufferSize, isBW);
     }
 }
 
-void save_quadtree(quadnode *tree, const char *filename) {
+void save_quadtree(quadnode *tree, const char *filename, int isBW) {
     FILE *fptr = fopen(filename, "w");
     unsigned long long int buffer = 0;
     int bufferSize = 0;
-    write_node_to_file(tree, fptr, &buffer, &bufferSize);
+    write_node_to_file(tree, fptr, &buffer, &bufferSize, isBW);
     if (bufferSize != 0)
         fputc(buffer << (8-bufferSize), fptr);
     fclose(fptr);
 }
 
-void write_node_to_file_bw(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize) {
-    *buffer <<= 1;
-    *bufferSize += 1;
-    if (node->northwest == NULL) {
-        *buffer += 1;
-        *buffer <<= 8;
-        *bufferSize += 8;
-        int grayscale = (node->color.red + node->color.green + node->color.blue) / 3;
-        *buffer += grayscale % 256;
-    }
-    while (*bufferSize >= 8) {
-        *bufferSize -= 8;
-        char byte = *buffer >> *bufferSize;
-        fputc(byte, fptr);
-    }
-    if (node->northwest != NULL) {
-        write_node_to_file_bw(node->northwest, fptr, buffer, bufferSize);
-        write_node_to_file_bw(node->northeast, fptr, buffer, bufferSize);
-        write_node_to_file_bw(node->southwest, fptr, buffer, bufferSize);
-        write_node_to_file_bw(node->southeast, fptr, buffer, bufferSize);
-    }
-}
-
-void save_quadtree_bw(quadnode *tree, const char *filename) {
-    FILE *fptr = fopen(filename, "w");
-    unsigned long long int buffer = 0;
-    int bufferSize = 0;
-    write_node_to_file_bw(tree, fptr, &buffer, &bufferSize);
-    if (bufferSize != 0)
-        fputc(buffer << (8-bufferSize), fptr);
-    fclose(fptr);
-}
-
-void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap) {
+void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap, int isBW) {
     if (*bufferSize == 0) {
         *buffer = fgetc(fptr);
         *bufferSize += 8;
@@ -127,75 +101,48 @@ void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buf
     int is_leaf = (*buffer >> (*bufferSize - 1)) % 2;
     *bufferSize -= 1;
     if (is_leaf) {
-        for (int i = 0; i < 4; i++) {
+        if (isBW) {
             *buffer <<= 8;
             *buffer += fgetc(fptr);
             *bufferSize += 8;
+            int grayscale = (*buffer >> (*bufferSize - 8)) % 256;
+            pixel current;
+            current.red = current.green = current.blue = grayscale;
+            current.alpha = 255; // assuming full opacity
+            node->color = current;
+            *bufferSize -= 8;
+        } else {
+            for (int i = 0; i < 4; i++) {
+                *buffer <<= 8;
+                *buffer += fgetc(fptr);
+                *bufferSize += 8;
+            }
+            pixel current;
+            current.red = (*buffer >> (*bufferSize - 8)) % 256;
+            current.blue = (*buffer >> (*bufferSize - 16)) % 256;
+            current.green = (*buffer >> (*bufferSize - 24)) % 256;
+            current.alpha = (*buffer >> (*bufferSize - 32)) % 256;
+            node->color = current;
+            *bufferSize -= 32;
         }
-        pixel current;
-        current.red = (*buffer >> (*bufferSize - 8)) % 256;
-        current.blue = (*buffer >> (*bufferSize - 16)) % 256;
-        current.green = (*buffer >> (*bufferSize - 24)) % 256;
-        current.alpha = (*buffer >> (*bufferSize - 32)) % 256;
-        node->color = current;
-        *bufferSize -= 32;
     } else {
         node->northwest = create_quadnode(NULL, node->x, node->y, node->size / 2, heap);
         node->northeast = create_quadnode(NULL, node->x + node->size / 2, node->y, node->size / 2, heap);
         node->southwest = create_quadnode(NULL, node->x, node->y + node->size / 2, node->size / 2, heap);
         node->southeast = create_quadnode(NULL, node->x + node->size / 2, node->y + node->size / 2, node->size / 2, heap);
-        read_node_from_file(node->northwest, fptr, buffer, bufferSize, heap);
-        read_node_from_file(node->northeast, fptr, buffer, bufferSize, heap);
-        read_node_from_file(node->southwest, fptr, buffer, bufferSize, heap);
-        read_node_from_file(node->southeast, fptr, buffer, bufferSize, heap);
+        read_node_from_file(node->northwest, fptr, buffer, bufferSize, heap, isBW);
+        read_node_from_file(node->northeast, fptr, buffer, bufferSize, heap, isBW);
+        read_node_from_file(node->southwest, fptr, buffer, bufferSize, heap, isBW);
+        read_node_from_file(node->southeast, fptr, buffer, bufferSize, heap, isBW);
     }
 }
 
-void read_node_from_file_bw(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, max_heap *heap) {
-    if (*bufferSize == 0) {
-        *buffer = fgetc(fptr);
-        *bufferSize += 8;
-    }
-    int is_leaf = (*buffer >> (*bufferSize - 1)) % 2;
-    *bufferSize -= 1;
-    if (is_leaf) {
-        *buffer <<= 8;
-        *buffer += fgetc(fptr);
-        *bufferSize += 8;
-        int grayscale = (*buffer >> (*bufferSize - 8)) % 256;
-        pixel current;
-        current.red = current.green = current.blue = grayscale;
-        current.alpha = 255; // assuming full opacity
-        node->color = current;
-        *bufferSize -= 8;
-    } else {
-        node->northwest = create_quadnode(NULL, node->x, node->y, node->size / 2, heap);
-        node->northeast = create_quadnode(NULL, node->x + node->size / 2, node->y, node->size / 2, heap);
-        node->southwest = create_quadnode(NULL, node->x, node->y + node->size / 2, node->size / 2, heap);
-        node->southeast = create_quadnode(NULL, node->x + node->size / 2, node->y + node->size / 2, node->size / 2, heap);
-        read_node_from_file_bw(node->northwest, fptr, buffer, bufferSize, heap);
-        read_node_from_file_bw(node->northeast, fptr, buffer, bufferSize, heap);
-        read_node_from_file_bw(node->southwest, fptr, buffer, bufferSize, heap);
-        read_node_from_file_bw(node->southeast, fptr, buffer, bufferSize, heap);
-    }
-}
-
-quadnode *load_quadtree(const char *filename, max_heap *heap) {
+quadnode *load_quadtree(const char *filename, max_heap *heap, int isBW) {
     FILE *fptr = fopen(filename, "r");
     unsigned long long int buffer = 0;
     int bufferSize = 0;
     quadnode *tree = create_quadnode(NULL, 0, 0, 512, heap);
-    read_node_from_file(tree, fptr, &buffer, &bufferSize, heap);
-    fclose(fptr);
-    return tree;
-}
-
-quadnode *load_quadtree_bw(const char *filename, max_heap *heap) {
-    FILE *fptr = fopen(filename, "r");
-    unsigned long long int buffer = 0;
-    int bufferSize = 0;
-    quadnode *tree = create_quadnode(NULL, 0, 0, 512, heap);
-    read_node_from_file_bw(tree, fptr, &buffer, &bufferSize, heap);
+    read_node_from_file(tree, fptr, &buffer, &bufferSize, heap, isBW);
     fclose(fptr);
     return tree;
 }
