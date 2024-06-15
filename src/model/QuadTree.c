@@ -26,6 +26,7 @@ quadnode *create_quadnode(MLV_Image *image, int x, int y, int size, max_heap *he
     node->x = x;
     node->y = y;
     node->size = size;
+    node->id = -1; // Par défaut, aucun identifiant
 
     // Ajouter le nœud au tas max
     insert_max_heap(heap, node);
@@ -34,7 +35,7 @@ quadnode *create_quadnode(MLV_Image *image, int x, int y, int size, max_heap *he
 }
 
 void subdivide(quadnode *node, MLV_Image *image, max_heap *heap) {
-    if (node->size <= 1) return; // Ne subdivisez pas si le nœud est de taille 1x1
+    if (node->size <= 1) return;
 
     node->northwest = create_quadnode(image, node->x, node->y, node->size / 2, heap);
     node->northeast = create_quadnode(image, node->x + node->size / 2, node->y, node->size / 2, heap);
@@ -49,6 +50,61 @@ void free_quadnode(quadnode *node) {
     free_quadnode(node->southwest);
     free_quadnode(node->southeast);
     free(node);
+}
+
+
+
+void save_quadtree(quadnode *tree, const char *filename, int isBW) {
+    FILE *fptr = fopen(filename, "w");
+    unsigned long long int buffer = 0;
+    int bufferSize = 0;
+    write_node_to_file(tree, fptr, &buffer, &bufferSize, isBW);
+    if (bufferSize != 0)
+        fputc(buffer << (8-bufferSize), fptr);
+    fclose(fptr);
+}
+
+
+void minimise_quadtree(quadnode *tree) {
+    if (tree == NULL || tree->northwest == NULL) return;
+    minimise_quadtree(tree->northwest);
+    minimise_quadtree(tree->northeast);
+    minimise_quadtree(tree->southwest);
+    minimise_quadtree(tree->southeast);
+    if (equal_pixels(tree->northwest->color, tree->northeast->color) &&
+        equal_pixels(tree->northwest->color, tree->southwest->color) &&
+        equal_pixels(tree->northwest->color, tree->southeast->color)) {
+        free_quadnode(tree->northwest);
+        free_quadnode(tree->northeast);
+        free_quadnode(tree->southwest);
+        free_quadnode(tree->southeast);
+        tree->northwest = NULL;
+        tree->northeast = NULL;
+        tree->southwest = NULL;
+        tree->southeast = NULL;
+    }
+}
+
+void assign_ids(quadnode *node, int *current_id) {
+    if (node == NULL || node->id != -1) return;
+    node->id = (*current_id)++;
+    assign_ids(node->northwest, current_id);
+    assign_ids(node->northeast, current_id);
+    assign_ids(node->southwest, current_id);
+    assign_ids(node->southeast, current_id);
+}
+
+void write_minimized_node_to_file(quadnode *node, FILE *fptr) {
+    if (node == NULL) return;
+    if (node->northwest == NULL) {
+        fprintf(fptr, "%d %d %d %d %d %d\n", node->id, 1, node->color.red, node->color.green, node->color.blue, node->color.alpha);
+    } else {
+        fprintf(fptr, "%d %d %d %d %d\n", node->id, node->northwest->id, node->northeast->id, node->southwest->id, node->southeast->id);
+        write_minimized_node_to_file(node->northwest, fptr);
+        write_minimized_node_to_file(node->northeast, fptr);
+        write_minimized_node_to_file(node->southwest, fptr);
+        write_minimized_node_to_file(node->southeast, fptr);
+    }
 }
 
 void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, int isBW) {
@@ -83,13 +139,27 @@ void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buff
     }
 }
 
-void save_quadtree(quadnode *tree, const char *filename, int isBW) {
+void save_quadtree_unminimized(quadnode *tree, const char *filename, int isBW) {
     FILE *fptr = fopen(filename, "w");
     unsigned long long int buffer = 0;
     int bufferSize = 0;
     write_node_to_file(tree, fptr, &buffer, &bufferSize, isBW);
     if (bufferSize != 0)
         fputc(buffer << (8-bufferSize), fptr);
+    fclose(fptr);
+}
+
+void save_quadtree_minimized(quadnode *tree, const char *filename, int isBW) {
+    int current_id = 0;
+    assign_ids(tree, &current_id);
+
+    FILE *fptr = fopen(filename, "w");
+    if (!fptr) {
+        perror("Failed to open file for writing");
+        return;
+    }
+
+    write_minimized_node_to_file(tree, fptr);
     fclose(fptr);
 }
 
@@ -108,7 +178,7 @@ void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buf
             int grayscale = (*buffer >> (*bufferSize - 8)) % 256;
             pixel current;
             current.red = current.green = current.blue = grayscale;
-            current.alpha = 255; // assuming full opacity
+            current.alpha = 255;
             node->color = current;
             *bufferSize -= 8;
         } else {
@@ -147,22 +217,8 @@ quadnode *load_quadtree(const char *filename, max_heap *heap, int isBW) {
     return tree;
 }
 
-void minimise_quadtree(quadnode *tree) {
-    if (tree == NULL || tree->northwest == NULL) return;
-    minimise_quadtree(tree->northwest);
-    minimise_quadtree(tree->northeast);
-    minimise_quadtree(tree->southwest);
-    minimise_quadtree(tree->southeast);
-    if (equal_pixels(tree->northwest->color, tree->northeast->color) &&
-        equal_pixels(tree->northwest->color, tree->southwest->color) &&
-        equal_pixels(tree->northwest->color, tree->southeast->color)) {
-        free_quadnode(tree->northwest);
-        free_quadnode(tree->northeast);
-        free_quadnode(tree->southwest);
-        free_quadnode(tree->southeast);
-        tree->northwest = NULL;
-        tree->northeast = NULL;
-        tree->southwest = NULL;
-        tree->southeast = NULL;
-    }
+
+//TODO
+quadnode *load_quadtree_minimized(const char *filename, max_heap *heap, int isBW) {
+    return NULL;
 }
