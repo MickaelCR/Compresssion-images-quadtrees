@@ -102,7 +102,7 @@ void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buff
             *buffer <<= 1;
             *bufferSize += 1;
             int grayscale = (node->color.red + node->color.green + node->color.blue) / 3;
-            *buffer += (grayscale % 256) % 128;
+            *buffer += (grayscale % 256) / 128;
         } else {
             *buffer <<= 32;
             *bufferSize += 32;
@@ -112,9 +112,11 @@ void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buff
             *buffer += ((long long) (node->color.alpha) % 256);
         }
     }
+    
     while (*bufferSize >= 8) {
         *bufferSize -= 8;
         char byte = *buffer >> *bufferSize;
+
         fputc(byte, fptr);
     }
     if (node->northwest != NULL) {
@@ -163,7 +165,7 @@ void read_node_from_file(quadnode *node, FILE *fptr, unsigned long long int *buf
                 *buffer += fgetc(fptr);
                 *bufferSize += 8;
             }
-            int grayscale = (*buffer >> (*bufferSize - 1));
+            int grayscale = (*buffer >> (*bufferSize - 1)) % 2;
             pixel current;
             current.red = current.green = current.blue = grayscale * 255;
             current.alpha = 255;

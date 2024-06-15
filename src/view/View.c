@@ -18,7 +18,6 @@ void draw_image(MLV_Image *image) {
 void draw_quadtree(quadnode *tree) {
 	if (tree->northwest == NULL) {
 		MLV_draw_filled_rectangle(tree->x, tree->y, tree->size, tree->size, to_MLV_Color(tree->color));
-		update_window();
 		return;
 	}
 	draw_quadtree(tree->northwest);

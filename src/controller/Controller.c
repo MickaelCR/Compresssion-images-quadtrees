@@ -15,7 +15,7 @@ void process_image(const char *filename) {
     max_heap *heap = create_max_heap(10);
     quadnode *tree = create_quadnode(image, 0, 0, 512, heap);
 
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 10000; i++) {
         quadnode *max_error_node = extract_max(heap);
         if (max_error_node && max_error_node->size > 1) {
             subdivide(max_error_node, image, heap);
@@ -40,6 +40,8 @@ void process_image(const char *filename) {
 
     if (loaded_tree) {
         draw_quadtree(loaded_tree);
+        update_window();
+        sleep(10);
         free_quadnode(loaded_tree);
     }
 
