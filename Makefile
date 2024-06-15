@@ -23,7 +23,7 @@ $(BIN_DIR)Main.o: $(SRC_DIR)$(CONTR_DIR)Main.c $(INC_DIR)$(CONTR_DIR)Controller.
 $(BIN_DIR)Pixel.o: $(SRC_DIR)$(MODEL_DIR)Pixel.c $(INC_DIR)$(MODEL_DIR)Pixel.h
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-$(BIN_DIR)Heap.o: $(SRC_DIR)$(MODEL_DIR)Heap.c $(INC_DIR)$(MODEL_DIR)Heap.h
+$(BIN_DIR)Heap.o: $(SRC_DIR)$(MODEL_DIR)Heap.c $(INC_DIR)$(MODEL_DIR)Heap.h $(INC_DIR)$(MODEL_DIR)QuadTree.h
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 $(BIN_DIR)QuadTree.o: $(SRC_DIR)$(MODEL_DIR)QuadTree.c $(INC_DIR)$(MODEL_DIR)QuadTree.h $(INC_DIR)$(MODEL_DIR)Pixel.h

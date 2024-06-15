@@ -1,4 +1,5 @@
 #include "../../include/model/Heap.h"
+#include "../../include/model/QuadTree.h"
 #include <stdlib.h>
 #include <stdio.h>
 

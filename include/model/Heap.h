@@ -1,7 +1,8 @@
 #ifndef MAX_HEAP_H
 #define MAX_HEAP_H
 
-#include "../model/QuadTree.h"
+struct _quadnode_;
+typedef struct _quadnode_ quadnode;
 
 typedef struct {
     quadnode **nodes;
