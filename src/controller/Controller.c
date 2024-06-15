@@ -42,6 +42,10 @@ void process_image(const char *filename) {
     draw_quadtree(tree);
     sleep(3);
 
+    tree = load_minimised_quadtree("result_minimized.qtc", heap, 0);
+    draw_quadtree(tree);
+    sleep(3);    
+
     // Libérer les ressources
     free_max_heap(heap);
     free_quadnode(tree);

@@ -25,5 +25,6 @@ quadnode *find_max_error(quadnode *node);
 void save_quadtree(quadnode *tree, char *filename);
 quadnode *load_quadtree(char *filename, max_heap *heap);
 void minimise_quadtree(quadnode *tree);
+quadnode *load_minimised_quadtree(char *filename, max_heap *heap, int blackAndWhite);
 
 #endif
