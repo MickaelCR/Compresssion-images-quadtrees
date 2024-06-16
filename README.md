@@ -21,8 +21,9 @@ Cela générera un exécutable dans le dossier `bin/`.
 
 Pour utiliser le programme, exécutez la commande suivante :
 ```bash
-./bin/compression <chemin-vers-l-image>
+./bin/compression <chemin-vers-l-image> --circles
 ```
+L'option --circles permet de choisir la forme à utiliser pour la génération de l'image. Par défaut, cette option n'est pas définie.
 
 ### État final du projet
 
