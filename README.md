@@ -1,4 +1,4 @@
-# Compression d'Images en Utilisant des Quadtrees - Projet de Programmation C
+# Compression d'Images avec quadtrees - Projet de Programmation C
 
 ## INFO1 - 2023/2024
 
@@ -21,7 +21,7 @@ Cela générera un exécutable dans le dossier `bin/`.
 
 Pour utiliser le programme, exécutez la commande suivante :
 ```bash
-./bin/compression <chemin-vers-l-image> --circles
+./bin/compression <chemin-vers-l-image> [--circles]
 ```
 L'option --circles permet de choisir la forme à utiliser pour la génération de l'image. Par défaut, cette option n'est pas définie.
 
@@ -38,7 +38,7 @@ Améliorations effectuées :
 - Implantation de la subdivision dynamique basée sur l'erreur.
 - Interface graphique pour une meilleure visualisation et interaction.
 - Capacité de charger des fichiers de sauvegarde minimisée.
-- Affichage à l'aide de forme géometrique
+- Affichage à l'aide de forme géometriques
 
 ### Détails de l'implémentation
 
@@ -70,7 +70,6 @@ Voici un diagramme simplifié de la structure de notre projet de compression d'i
 │   └── view/
 │       └── View.h           # Déclarations pour les fonctions de visualisation.
 ├── resources/               # Ressources utilisées dans le projet (images, données).
-│   └── mr-bean.jpg          # Image de test pour la compression.
 └── src/                     # Source du projet contenant les définitions des fonctions.
     ├── controller/
     │   ├── Controller.c     # Implémentation des fonctions de contrôle.
@@ -145,17 +144,23 @@ Voici un diagramme simplifié de la structure de notre projet de compression d'i
 ```
 
 #### Modularisation de l'architecture
-- **Difficulté** : Assurer une structure de code claire et maintenable dans un projet complexe.
-- **Solution** : Nous avons structuré le code pour faciliter la maintenance et l'évolutivité. Voici comment nous avons géré la création de sous-arbres pour subdiviser l'image :
 
-```c
-void subdivide(quadnode * node, MLV_Image * image, max_heap * heap) {
-    if (node -> size <= 1) return; // Arrêter la subdivision si la taille est trop petite
-      // Créer des sous-nœuds pour chaque quadrant
-    node->northwest = create_quadnode(image, node->x, node->y, node->size / 2, heap);
-    node->northeast = create_quadnode(image, node->x + node->size / 2, node->y, node->size / 2, heap);
-}
-```
+- **Difficulté** : Assurer une structure de code claire et maintenable dans un projet complexe.
+- **Solution** : Nous avons structuré le code selon le modèle MVC (Modèle-Vue-Contrôleur) pour améliorer la clarté et faciliter les modifications futures.
+
+**Modèle (Model)** :
+- Gère la logique des données et l'état.
+- Inclut la gestion des quadtrees et des tas max.
+- Responsable de la manipulation des données d'image et du calcul des erreurs.
+
+**Vue (View)** :
+- Génère l'interface utilisateur basée sur les données du modèl.
+- Affiche les images et les résultats de la compression.
+
+**Contrôleur (Controller)** :
+- Gère les entrées de l'utilisateur et les interactions.
+- Interagit avec le modèle pour modifier l'état des données.
+- Met à jour la vue pour refléter les changements.
 
 
 #### Utilisation d'un tas max pour la gestion des erreurs
