@@ -82,14 +82,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a451a4fb29fc0524a0e2553ed5512953c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_controller_8c.html#a451a4fb29fc0524a0e2553ed5512953c">process_image</a> (MLV_Image *image, int useCircles)</td></tr>
 <tr class="memdesc:a451a4fb29fc0524a0e2553ed5512953c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traite une image et génère un quadtree.  <a href="_controller_8c.html#a451a4fb29fc0524a0e2553ed5512953c">More...</a><br /></td></tr>
 <tr class="separator:a451a4fb29fc0524a0e2553ed5512953c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1d39b553141e0728f439d166dc6bb42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_controller_8c.html#ad1d39b553141e0728f439d166dc6bb42">save_quadtree_unminimized_bw</a> (<a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *tree)</td></tr>
-<tr class="separator:ad1d39b553141e0728f439d166dc6bb42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12a34ea45eb353b8e0652d05137dfa13"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_controller_8c.html#a12a34ea45eb353b8e0652d05137dfa13">save_quadtree_unminimized_color</a> (<a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *tree)</td></tr>
-<tr class="separator:a12a34ea45eb353b8e0652d05137dfa13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01568b32d02bf3629385bdb28866e3a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_controller_8c.html#a01568b32d02bf3629385bdb28866e3a2">minimize_and_save_quadtree_bw</a> (<a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *tree)</td></tr>
-<tr class="separator:a01568b32d02bf3629385bdb28866e3a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a271e3335ce20f7f2b1eb840b118ca0f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_controller_8c.html#a271e3335ce20f7f2b1eb840b118ca0f7">minimize_and_save_quadtree_color</a> (<a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *tree)</td></tr>
-<tr class="separator:a271e3335ce20f7f2b1eb840b118ca0f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71e55784707c7c4b4087029fb96cd8a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_controller_8c.html#a71e55784707c7c4b4087029fb96cd8a2">load_tree</a> (char **pathInput, MLV_Image **image, <a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> **tree)</td></tr>
 <tr class="separator:a71e55784707c7c4b4087029fb96cd8a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06039e5efc95eed656684816e2420adf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_controller_8c.html#a06039e5efc95eed656684816e2420adf">handle_button_click</a> (int buttonIndex, MLV_Image **image, <a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> **tree, int useCircles, char **pathInput)</td></tr>
@@ -238,42 +230,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a01568b32d02bf3629385bdb28866e3a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01568b32d02bf3629385bdb28866e3a2">&#9670;&nbsp;</a></span>minimize_and_save_quadtree_bw()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void minimize_and_save_quadtree_bw </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *&#160;</td>
-          <td class="paramname"><em>tree</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a271e3335ce20f7f2b1eb840b118ca0f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a271e3335ce20f7f2b1eb840b118ca0f7">&#9670;&nbsp;</a></span>minimize_and_save_quadtree_color()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void minimize_and_save_quadtree_color </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *&#160;</td>
-          <td class="paramname"><em>tree</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a451a4fb29fc0524a0e2553ed5512953c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a451a4fb29fc0524a0e2553ed5512953c">&#9670;&nbsp;</a></span>process_image()</h2>
 
@@ -309,42 +265,6 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointeur vers le quadtree généré. </dd></dl>
-
-</div>
-</div>
-<a id="ad1d39b553141e0728f439d166dc6bb42"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1d39b553141e0728f439d166dc6bb42">&#9670;&nbsp;</a></span>save_quadtree_unminimized_bw()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void save_quadtree_unminimized_bw </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *&#160;</td>
-          <td class="paramname"><em>tree</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a12a34ea45eb353b8e0652d05137dfa13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12a34ea45eb353b8e0652d05137dfa13">&#9670;&nbsp;</a></span>save_quadtree_unminimized_color()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void save_quadtree_unminimized_color </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_heap_8h.html#a77a0b8e83a92df19c237d0c46317455c">quadnode</a> *&#160;</td>
-          <td class="paramname"><em>tree</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

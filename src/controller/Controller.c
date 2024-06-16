@@ -32,28 +32,6 @@ quadnode *process_image(MLV_Image *image, int useCircles) {
     return tree;
 }
 
-void save_quadtree_unminimized_bw(quadnode *tree) {
-    // Sauvegarde du quadtree non minimisé en noir et blanc
-    save_unminimized_quadtree(tree, "resources/save/result.qtn", 1);
-}
-
-void save_quadtree_unminimized_color(quadnode *tree) {
-    // Sauvegarde du quadtree non minimisé en couleur
-    save_unminimized_quadtree(tree, "resources/save/result.qtc", 0);
-}
-
-void minimize_and_save_quadtree_bw(quadnode *tree) {
-    // Minimisation et sauvegarde du quadtree en noir et blanc
-    minimise_quadtree(tree);
-    save_minimized_quadtree(tree, "resources/save/result.gmn", 1);
-}
-
-void minimize_and_save_quadtree_color(quadnode *tree) {
-    // Minimisation et sauvegarde du quadtree en couleur
-    minimise_quadtree(tree);
-    save_minimized_quadtree(tree, "resources/save/result.gmc", 0);
-}
-
 void load_tree(char **pathInput, MLV_Image **image, quadnode **tree) {
     // Boîte de dialogue pour entrer un chemin de fichier valide
     MLV_wait_input_box(0, 512, 512, 100, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, "   Entrez un chemin valide : ", pathInput);
@@ -84,10 +62,10 @@ void handle_button_click(int buttonIndex, MLV_Image **image, quadnode **tree, in
             *tree = process_image(*image, useCircles);
             break;
         case 1:
-            save_quadtree_unminimized_bw(*tree);
+            save_unminimized_quadtree(*tree, "resources/save/result.qtn", 1);
             break;
         case 2:
-            save_quadtree_unminimized_color(*tree);
+            save_unminimized_quadtree(*tree, "resources/save/result.qtc", 0);
             break;
         case 3:
             minimise_quadtree(*tree);
@@ -96,10 +74,10 @@ void handle_button_click(int buttonIndex, MLV_Image **image, quadnode **tree, in
             load_tree(pathInput, image, tree);
             break;
         case 5:
-            minimize_and_save_quadtree_bw(*tree);
+            save_minimized_quadtree(*tree, "resources/save/result.gmn", 1);
             break;
         case 6:
-            minimize_and_save_quadtree_color(*tree);
+            minimise_quadtree(*tree);
             break;
     }
 }
@@ -109,25 +87,20 @@ void main_loop(MLV_Image *image, quadnode *tree, int useCircles) {
     int buttonIndex = -1;
     char *pathInput = "";
 
-    // Boucle principale de l'application
     while (buttonIndex != 7) {
         draw_interface_buttons();
         if (tree != NULL) draw_quadtree(tree, useCircles);
         else draw_image(image);
         update_window();
 
-        // Attente du clic de souris
         MLV_wait_mouse(&clickX, &clickY);
         hide_buttons();
 
-        // Calcul de l'index du bouton cliqué
         buttonIndex = clickX / 128 + 4 * ((clickY - 512) / 50);
         if (buttonIndex != 0 && buttonIndex != 4 && tree == NULL) continue;
         
-        // Gestion du clic sur le bouton
         handle_button_click(buttonIndex, &image, &tree, useCircles, &pathInput);
     }
 
-    // Libération des ressources
     free_quadnode(tree);
 }

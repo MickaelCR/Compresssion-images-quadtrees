@@ -21,11 +21,7 @@ int main(int argc, char *argv[]) {
         switch (opt) {
             case 'c':
                 useCircles = 1;
-                break;
-            case '?':
-                // Affiche un message d'erreur pour les options non reconnues
-                fprintf(stderr, "Option inconnue\n");
-                return 1;
+                break;  
         }
     }
 
@@ -44,7 +40,6 @@ int main(int argc, char *argv[]) {
     // Boucle principale
     main_loop(image, tree, useCircles);
 
-    // Libération des ressources
     MLV_free_image(image);
     free_window();
     return 0;

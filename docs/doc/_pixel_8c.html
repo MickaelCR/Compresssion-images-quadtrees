@@ -78,16 +78,16 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a09e816ae00482815b75026887f027f6e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_pixel_8c.html#a09e816ae00482815b75026887f027f6e">distance</a> (<a class="el" href="_pixel_8h.html#a910aa9314b718bc91c2bdb1ed4da6a8d">pixel</a> pixel1, <a class="el" href="_pixel_8h.html#a910aa9314b718bc91c2bdb1ed4da6a8d">pixel</a> pixel2)</td></tr>
-<tr class="memdesc:a09e816ae00482815b75026887f027f6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calcule la distance euclidienne entre deux pixels.  <a href="_pixel_8c.html#a09e816ae00482815b75026887f027f6e">More...</a><br /></td></tr>
+<tr class="memdesc:a09e816ae00482815b75026887f027f6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calcule la distance entre deux pixels.  <a href="_pixel_8c.html#a09e816ae00482815b75026887f027f6e">More...</a><br /></td></tr>
 <tr class="separator:a09e816ae00482815b75026887f027f6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad40bca84a87de1d73c16a465e4837e98"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_pixel_8c.html#ad40bca84a87de1d73c16a465e4837e98">equal_pixels</a> (<a class="el" href="_pixel_8h.html#a910aa9314b718bc91c2bdb1ed4da6a8d">pixel</a> pixel1, <a class="el" href="_pixel_8h.html#a910aa9314b718bc91c2bdb1ed4da6a8d">pixel</a> pixel2)</td></tr>
 <tr class="memdesc:ad40bca84a87de1d73c16a465e4837e98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vérifie si deux pixels sont égaux.  <a href="_pixel_8c.html#ad40bca84a87de1d73c16a465e4837e98">More...</a><br /></td></tr>
 <tr class="separator:ad40bca84a87de1d73c16a465e4837e98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a299184748074e9c93b3213408a5ed0c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_pixel_8h.html#a910aa9314b718bc91c2bdb1ed4da6a8d">pixel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_pixel_8c.html#a299184748074e9c93b3213408a5ed0c6">read_image</a> (MLV_Image *image, int startX, int startY, int size)</td></tr>
-<tr class="memdesc:a299184748074e9c93b3213408a5ed0c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lit les pixels d'une image et calcule la couleur moyenne d'un carré de taille spécifiée.  <a href="_pixel_8c.html#a299184748074e9c93b3213408a5ed0c6">More...</a><br /></td></tr>
+<tr class="memdesc:a299184748074e9c93b3213408a5ed0c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lit la couleur moyenne d'une région d'une image.  <a href="_pixel_8c.html#a299184748074e9c93b3213408a5ed0c6">More...</a><br /></td></tr>
 <tr class="separator:a299184748074e9c93b3213408a5ed0c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a182a00f64711b792a879bbbe41fad64f"><td class="memItemLeft" align="right" valign="top">MLV_Color&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_pixel_8c.html#a182a00f64711b792a879bbbe41fad64f">to_MLV_Color</a> (<a class="el" href="_pixel_8h.html#a910aa9314b718bc91c2bdb1ed4da6a8d">pixel</a> <a class="el" href="_pixel_8h.html#a910aa9314b718bc91c2bdb1ed4da6a8d">pixel</a>)</td></tr>
-<tr class="memdesc:a182a00f64711b792a879bbbe41fad64f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convertit un pixel en une couleur MLV.  <a href="_pixel_8c.html#a182a00f64711b792a879bbbe41fad64f">More...</a><br /></td></tr>
+<tr class="memdesc:a182a00f64711b792a879bbbe41fad64f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convertit une structure pixel en MLV_Color.  <a href="_pixel_8c.html#a182a00f64711b792a879bbbe41fad64f">More...</a><br /></td></tr>
 <tr class="separator:a182a00f64711b792a879bbbe41fad64f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -117,16 +117,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calcule la distance euclidienne entre deux pixels. </p>
-<p>Calcule la distance entre deux pixels.</p>
+<p>Calcule la distance entre deux pixels. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pixel1</td><td>Le premier pixel. </td></tr>
-    <tr><td class="paramname">pixel2</td><td>Le second pixel. </td></tr>
+    <tr><td class="paramname">pixel2</td><td>Le deuxième pixel. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>La distance euclidienne entre les deux pixels. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>La distance entre les deux pixels. </dd></dl>
 
 </div>
 </div>
@@ -160,7 +159,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pixel1</td><td>Le premier pixel. </td></tr>
-    <tr><td class="paramname">pixel2</td><td>Le second pixel. </td></tr>
+    <tr><td class="paramname">pixel2</td><td>Le deuxième pixel. </td></tr>
   </table>
   </dd>
 </dl>
@@ -206,18 +205,17 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Lit les pixels d'une image et calcule la couleur moyenne d'un carré de taille spécifiée. </p>
-<p>Lit la couleur moyenne d'une région d'une image.</p>
+<p>Lit la couleur moyenne d'une région d'une image. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">image</td><td>L'image MLV à lire. </td></tr>
-    <tr><td class="paramname">startX</td><td>La coordonnée X de départ du carré. </td></tr>
-    <tr><td class="paramname">startY</td><td>La coordonnée Y de départ du carré. </td></tr>
-    <tr><td class="paramname">size</td><td>La taille du carré. </td></tr>
+    <tr><td class="paramname">image</td><td>L'image à partir de laquelle lire. </td></tr>
+    <tr><td class="paramname">startX</td><td>La coordonnée x de départ. </td></tr>
+    <tr><td class="paramname">startY</td><td>La coordonnée y de départ. </td></tr>
+    <tr><td class="paramname">size</td><td>La taille de la région à lire. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>La couleur moyenne des pixels dans le carré spécifié. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>La couleur moyenne de la région spécifiée. </dd></dl>
 
 </div>
 </div>
@@ -237,8 +235,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Convertit un pixel en une couleur MLV. </p>
-<p>Convertit une structure pixel en MLV_Color.</p>
+<p>Convertit une structure pixel en MLV_Color. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pixel</td><td>Le pixel à convertir. </td></tr>
