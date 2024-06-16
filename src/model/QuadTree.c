@@ -216,14 +216,16 @@ int minimise_quadtree(quadnode *tree) {
 }
 
 void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, int blackAndWhite) {
-    rewind(fptr);
     char *line = NULL;
     size_t len;
     int currentIndex;
     char afterNumber;
     pixel currentPixel = {0, 0, 0, 0};
-    while (getline(&line, &len, fptr) != -1) {
+    while (1) {
+        int lineValidity = getline(&line, &len, fptr);
         int scanned = sscanf(line, "%d%c%d %d %d %d", &currentIndex, &afterNumber, &(currentPixel.red), &(currentPixel.green), &(currentPixel.blue), &(currentPixel.alpha));
+        if (lineValidity != -1 && currentIndex > nodeIndex)
+            rewind(fptr);
         if (currentIndex == nodeIndex) {
             if ((!blackAndWhite && afterNumber == ' ') || (blackAndWhite && scanned==6)) {
                 node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, NULL);

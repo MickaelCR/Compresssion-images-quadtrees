@@ -20,11 +20,12 @@ int main(int argc, char *argv[]) {
         else draw_image(image);
         update_window();
         MLV_wait_mouse(&clickX, &clickY);
+        hide_buttons();
         buttonIndex = clickX/128 + 4*((clickY-512)/50);
         if (buttonIndex != 0 && buttonIndex != 4 && tree == NULL) continue;
         switch (buttonIndex) {
             case 0:
-                tree = process_image(image);
+                tree = process_image(image, useCircles);
                 break;
             case 1:
                 save_quadtree_unminimized(tree, "result.qtn", 1);
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
                 minimise_quadtree(tree);
                 break;
             case 4:
-                MLV_wait_input_box(0, 0, 512, 50, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, "   Entrez un chemin valide : ", &pathInput);
+                MLV_wait_input_box(0, 512, 512, 100, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, "   Entrez un chemin valide : ", &pathInput);
                 if (!MLV_path_is_a_file(pathInput)) break;
                 free_quadnode(tree);
                 int length = strlen(pathInput);
@@ -45,9 +46,9 @@ int main(int argc, char *argv[]) {
                 else if (strncmp(pathInput + length - 4, ".qtn", 4) == 0)
                     tree = load_quadtree(pathInput, 1);
                 else if (strncmp(pathInput + length - 4, ".gmc", 4) == 0)
-                    tree = load_quadtree(pathInput, 0);
+                    tree = load_minimised_quadtree(pathInput, 0);
                 else if (strncmp(pathInput + length - 4, ".gmn", 4) == 0)
-                    tree = load_quadtree(pathInput, 1);
+                    tree = load_minimised_quadtree(pathInput, 1);
                 else {
                     tree = NULL;
                     MLV_free_image(image);
@@ -55,10 +56,10 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 5:
-                save_quadtree_unminimized(tree, "result.gmn", 1);
+                save_quadtree_minimized(tree, "result.gmn", 1);
                 break;
             case 6:
-                save_quadtree_unminimized(tree, "result.gmc", 0);
+                save_quadtree_minimized(tree, "result.gmc", 0);
                 break;
         }
     }
