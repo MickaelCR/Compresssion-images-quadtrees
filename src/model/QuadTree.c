@@ -195,15 +195,12 @@ quadnode *load_quadtree(char *filename,  int isBW) {
     return tree;
 }
 
-void minimise_quadtree(quadnode *tree) {
-    if (tree == NULL || tree->northwest == NULL) return;
-    minimise_quadtree(tree->northwest);
-    minimise_quadtree(tree->northeast);
-    minimise_quadtree(tree->southwest);
-    minimise_quadtree(tree->southeast);
-    if (equal_pixels(tree->northwest->color, tree->northeast->color) &&
-        equal_pixels(tree->northwest->color, tree->southwest->color) &&
-        equal_pixels(tree->northwest->color, tree->southeast->color)) {
+int minimise_quadtree(quadnode *tree) {
+    if (tree == NULL || tree->northwest == NULL) return 0;
+    int sum = minimise_quadtree(tree->northwest) + minimise_quadtree(tree->northeast) + minimise_quadtree(tree->southwest) + minimise_quadtree(tree->southeast);
+    if (sum == 0 && equal_pixels(tree->northwest->color, tree->northeast->color) &&
+                    equal_pixels(tree->northwest->color, tree->southwest->color) &&
+                    equal_pixels(tree->northwest->color, tree->southeast->color)) {
         tree->color = tree->northwest->color;
         free_quadnode(tree->northwest);
         free_quadnode(tree->northeast);
@@ -213,18 +210,22 @@ void minimise_quadtree(quadnode *tree) {
         tree->northeast = NULL;
         tree->southwest = NULL;
         tree->southeast = NULL;
+        return 0;
     }
+    return 1;
 }
 
 void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, int blackAndWhite) {
-    rewind(fptr);
     char *line = NULL;
     size_t len;
     int currentIndex;
     char afterNumber;
     pixel currentPixel = {0, 0, 0, 0};
-    while (getline(&line, &len, fptr) != -1) {
+    while (1) {
+        int lineValidity = getline(&line, &len, fptr);
         int scanned = sscanf(line, "%d%c%d %d %d %d", &currentIndex, &afterNumber, &(currentPixel.red), &(currentPixel.green), &(currentPixel.blue), &(currentPixel.alpha));
+        if (lineValidity != -1 && currentIndex > nodeIndex)
+            rewind(fptr);
         if (currentIndex == nodeIndex) {
             if ((!blackAndWhite && afterNumber == ' ') || (blackAndWhite && scanned==6)) {
                 node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, NULL);
