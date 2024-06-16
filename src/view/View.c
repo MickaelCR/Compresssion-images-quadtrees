@@ -8,24 +8,25 @@ void initialize_window() {
 }
 
 void draw_interface_buttons() {
-	MLV_draw_filled_rectangle(0, 0, 512, 512, MLV_COLOR_WHITE);
-	MLV_draw_text_box(0, 512, 128, 50, "Approximation", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-	MLV_draw_text_box(128, 512, 128, 50, "Sauv. Noir&Blanc", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-	MLV_draw_text_box(256, 512, 128, 50, "Sauv. RGBA", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-	MLV_draw_text_box(384, 512, 128, 50, "Minimisation", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-	MLV_draw_text_box(0, 562, 128, 50, "Charger Fichier", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-	MLV_draw_text_box(128, 562, 128, 50, "Sauv. Min. N&B", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-	MLV_draw_text_box(256, 562, 128, 50, "Sauv. Min. RGBA", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-	MLV_draw_text_box(384, 562, 128, 50, "Quitter", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_filled_rectangle(0, 0, 512, 512, MLV_COLOR_WHITE);
+    MLV_draw_text_box(0, 512, 128, 50, "Approximation", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box(128, 512, 128, 50, "Sauv. Noir&Blanc", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box(256, 512, 128, 50, "Sauv. RGBA", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box(384, 512, 128, 50, "Minimisation", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box(0, 562, 128, 50, "Charger Fichier", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box(128, 562, 128, 50, "Sauv. Min. N&B", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box(256, 562, 128, 50, "Sauv. Min. RGBA", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box(384, 562, 128, 50, "Quitter", 5, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
 }
 
 void hide_buttons() {
-	MLV_draw_filled_rectangle(0, 512, 512, 100, MLV_COLOR_DARKGRAY);
-	MLV_draw_rectangle(0, 512, 512, 100, MLV_COLOR_WHITE);
+    // Dessine un rectangle gris pour cacher les boutons
+    MLV_draw_filled_rectangle(0, 512, 512, 100, MLV_COLOR_DARKGRAY);
+    MLV_draw_rectangle(0, 512, 512, 100, MLV_COLOR_WHITE);
 }
 
 MLV_Image *load_image(const char *filename) {
-	MLV_Image *image = MLV_load_image(filename);
+    MLV_Image *image = MLV_load_image(filename);
     if (!image) {
         fprintf(stderr, "Could not load image %s\n", filename);
         return NULL;
@@ -38,15 +39,20 @@ void draw_image(MLV_Image *image) {
 }
 
 void draw_quadtree(quadnode *tree, int useCircles) {
-	if (tree->northwest == NULL) {
-		if (useCircles) MLV_draw_filled_circle(tree->x+tree->size/2, tree->y+tree->size/2, tree->size/2, to_MLV_Color(tree->color));
-		else MLV_draw_filled_rectangle(tree->x, tree->y, tree->size, tree->size, to_MLV_Color(tree->color));
-		return;
-	}
-	draw_quadtree(tree->northwest, useCircles);
-	draw_quadtree(tree->northeast, useCircles);
-	draw_quadtree(tree->southwest, useCircles);
-	draw_quadtree(tree->southeast, useCircles);
+    if (tree->northwest == NULL) {
+        // Le nœud est une feuille, dessine un cercle ou un rectangle selon l'option
+        if (useCircles) {
+            MLV_draw_filled_circle(tree->x + tree->size / 2, tree->y + tree->size / 2, tree->size / 2, to_MLV_Color(tree->color));
+        } else {
+            MLV_draw_filled_rectangle(tree->x, tree->y, tree->size, tree->size, to_MLV_Color(tree->color));
+        }
+        return;
+    }
+    // Appelle récursivement la fonction pour dessiner les sous-nœuds
+    draw_quadtree(tree->northwest, useCircles);
+    draw_quadtree(tree->northeast, useCircles);
+    draw_quadtree(tree->southwest, useCircles);
+    draw_quadtree(tree->southeast, useCircles);
 }
 
 void update_window() {

@@ -1,6 +1,6 @@
 # Compression d'Images avec quadtrees - Projet de Programmation C
 
-## INFO1 - 2023/2024
+## INFO1 - 2024/2024
 
 ## Binôme
 
@@ -108,12 +108,12 @@ Voici un diagramme simplifié de la structure de notre projet de compression d'i
 - **Solution** : Nous avons utilisé des opérations bit à bit, comme spécifié dans le projet, pour optimiser la compression des données d'image. Cette approche est particulièrement efficace pour réduire la taille des fichiers sans perdre en qualité d'image. Par exemple, pour écrire efficacement les données compressées dans un fichier, nous avons utilisé le code suivant :
 
 ```c
-  void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, int isBW) {
+  void write_node_to_file(quadnode *node, FILE *fptr, unsigned long long int *buffer, int *bufferSize, int isBlackAndWhite) {
       *buffer <<= 1; // Décale le buffer d'un bit à gauche pour faire de la place pour le nouveau bit.
       *bufferSize += 1; // Incrémente la taille du buffer utilisé.
       if (node->northwest == NULL) {
           *buffer += 1; // Ajoute un bit à 1 pour marquer que c'est une feuille.
-          if (isBW) {
+          if (isBlackAndWhite) {
               *buffer <<= 1; // Décale à nouveau pour le bit de couleur.
               *bufferSize += 1;
               int grayscale = (node->color.red + node->color.green + node->color.blue) / 3;
@@ -135,10 +135,10 @@ Voici un diagramme simplifié de la structure de notre projet de compression d'i
       }
       // Recursion pour les autres quadrants si ce n'est pas une feuille.
       if (node->northwest != NULL) {
-          write_node_to_file(node->northwest, fptr, buffer, bufferSize, isBW);
-          write_node_to_file(node->northeast, fptr, buffer, bufferSize, isBW);
-          write_node_to_file(node->southwest, fptr, buffer, bufferSize, isBW);
-          write_node_to_file(node->southeast, fptr, buffer, bufferSize, isBW);
+          write_node_to_file(node->northwest, fptr, buffer, bufferSize, isBlackAndWhite);
+          write_node_to_file(node->northeast, fptr, buffer, bufferSize, isBlackAndWhite);
+          write_node_to_file(node->southwest, fptr, buffer, bufferSize, isBlackAndWhite);
+          write_node_to_file(node->southeast, fptr, buffer, bufferSize, isBlackAndWhite);
       }
   }
 ```
@@ -184,9 +184,9 @@ quadnode * create_quadnode(MLV_Image * image, int x, int y, int size, max_heap *
 
 ```c
 void save_quadtree_minimized(quadnode * tree,
-  const char * filename, int isBW) {
+  const char * filename, int isBlackAndWhite) {
   FILE * fptr = fopen(filename, "w"); // Ouvrir le fichier
-  write_minimized_node_to_file(tree, fptr, isBW); // Écrire le quadtree minimisé
+  write_minimized_node_to_file(tree, fptr, isBlackAndWhite); // Écrire le quadtree minimisé
   fclose(fptr);
 }
 ```
