@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
     initialize_window();
     draw_interface_buttons();
     MLV_Image *image = load_image(argv[1]);
+    quadnode *tree = NULL;
     draw_image(image);
     update_window();
 
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
         buttonIndex = clickX/128 + 4*((clickY-512)/50);
         switch (buttonIndex) {
             case 0:
-                process_image(image);
+                tree = process_image(image);
                 break;
         }
     }

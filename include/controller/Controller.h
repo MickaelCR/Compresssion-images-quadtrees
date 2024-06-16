@@ -7,6 +7,6 @@
 #include "../model/Heap.h"
 #include "../view/View.h"
 
-void process_image(MLV_Image* image);
+quadnode *process_image(MLV_Image* image);
 
 #endif

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void process_image(MLV_Image *image) {
+quadnode *process_image(MLV_Image *image) {
     // Créer le tas max
     max_heap *heap = create_max_heap(1000);
 
@@ -30,11 +30,15 @@ void process_image(MLV_Image *image) {
     draw_quadtree(tree);
     sleep(3);
 
-    tree = load_minimised_quadtree("test", 1);
+    tree = load_minimised_quadtree("testbw.gmn", 1);
+    draw_quadtree(tree);
+    sleep(3);    
+
+    tree = load_minimised_quadtree("testcolor.gmc", 0);
     draw_quadtree(tree);
     sleep(3);    
 
     // Libérer les ressources
     free_max_heap(heap);
-    free_quadnode(tree);
+    return tree;
 }
