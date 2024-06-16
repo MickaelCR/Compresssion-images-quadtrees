@@ -27,7 +27,7 @@ void subdivide(quadnode *node, MLV_Image *image, max_heap *heap);
 void free_quadnode(quadnode *node);
 
 quadnode *load_quadtree(char *filenam, int isBW);
-void minimise_quadtree(quadnode *tree);
+int minimise_quadtree(quadnode *tree);
 quadnode *load_minimised_quadtree(char *filename, int blackAndWhite);
 
 void assign_ids(quadnode *node, int *current_id);

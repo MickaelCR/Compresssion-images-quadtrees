@@ -22,7 +22,7 @@ quadnode *process_image(MLV_Image *image) {
     int isBW = 1;
     int isMinimized = 1;
     if (isMinimized) {
-        minimise_quadtree(tree);
+        //minimise_quadtree(tree);
         save_quadtree_minimized(tree, isBW ? "result_minimized.qtn" : "result_minimized.qtc", isBW);
     } else {
         save_quadtree_unminimized(tree, isBW ? "result.qtn" : "result.qtc", isBW);
@@ -36,12 +36,12 @@ quadnode *process_image(MLV_Image *image) {
         loaded_tree = load_quadtree(isBW ? "result.qtn" : "result.qtc", isBW);
     }
 
-    if (loaded_tree) {
-        draw_quadtree(loaded_tree);
+    /*if (loaded_tree) {
+        draw_quadtree(loaded_tree, 0);
         update_window();
-        sleep(10);
+        sleep(3);
         free_quadnode(loaded_tree);
-    }
+    }*/
 
 
     free_max_heap(heap);
