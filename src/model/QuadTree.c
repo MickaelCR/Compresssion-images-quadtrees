@@ -80,7 +80,7 @@ void write_minimized_node_to_file(quadnode *node, FILE *fptr, int blackAndWhite)
     if (node->northwest == NULL) {
         // Node is a leaf
         if(blackAndWhite)
-            fprintf(fptr, "%d %d\n", node->id, (((node->color.red + node->color.green + node->color.blue) / 3) % 128));
+            fprintf(fptr, "%d %d\n", node->id, (((node->color.red + node->color.green + node->color.blue) / 3) / 128));
         else
             fprintf(fptr, "%df %d %d %d %d\n", node->id, node->color.red, node->color.green, node->color.blue, node->color.alpha);
         
@@ -237,6 +237,7 @@ void read_minimised_node_from_file(quadnode *node, FILE *fptr, int nodeIndex, ma
     pixel currentPixel = {0, 0, 0, 0};
     while (getline(&line, &len, fptr) != -1) {
         int scanned = sscanf(line, "%d%c%d %d %d %d", &currentIndex, &afterNumber, &(currentPixel.red), &(currentPixel.green), &(currentPixel.blue), &(currentPixel.alpha));
+        printf("%d%c%d %d %d %d\n", currentIndex, afterNumber, (currentPixel.red), (currentPixel.green), (currentPixel.blue), (currentPixel.alpha));
         if (currentIndex == nodeIndex) {
             if ((!blackAndWhite && afterNumber == ' ') || (blackAndWhite && scanned==6)) {
                 node->northwest = create_quadnode(NULL, node->x, node->y, node->size/2, heap);

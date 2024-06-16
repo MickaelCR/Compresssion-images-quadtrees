@@ -15,14 +15,14 @@ void process_image(const char *filename) {
     max_heap *heap = create_max_heap(10);
     quadnode *tree = create_quadnode(image, 0, 0, 512, heap);
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 100; i++) {
         quadnode *max_error_node = extract_max(heap);
         if (max_error_node && max_error_node->size > 1) {
             subdivide(max_error_node, image, heap);
         }
     }
     int isBW = 1;
-    int isMinimized = 0;
+    int isMinimized = 1;
     if (isMinimized) {
         minimise_quadtree(tree);
         save_quadtree_minimized(tree, isBW ? "result_minimized.qtn" : "result_minimized.qtc", isBW);
@@ -33,7 +33,7 @@ void process_image(const char *filename) {
     heap = create_max_heap(100);
     quadnode *loaded_tree;
     if (isMinimized) {
-        loaded_tree = load_minimised_quadtree("result_minimized.qtc", heap, isBW);
+        loaded_tree = load_minimised_quadtree(isBW ? "result_minimized.qtn" : "result_minimized.qtc", heap, isBW);
     } else {
         loaded_tree = load_quadtree(isBW ? "result.qtn" : "result.qtc", heap, isBW);
     }
