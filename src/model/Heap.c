@@ -1,22 +1,56 @@
+/**
+ * @file Heap.c
+ * @brief Fichier source pour la gestion d'un tas (max heap) utilisé dans les opérations sur les quadtree.
+ * 
+ * Ce fichier contient les définitions des fonctions pour créer, insérer, extraire et libérer un tas max 
+ * utilisé pour optimiser les opérations de subdivision dans les quadtree.
+ * 
+ * @auteurs 
+ * Mickaël Rakotoarison 
+ * Romain Buges
+ * @date 2024
+ */
+
 #include "../../include/model/Heap.h"
 #include "../../include/model/QuadTree.h"
 #include <stdlib.h>
 #include <stdio.h>
 
+/**
+ * @brief Échange deux pointeurs de nœuds dans le tas.
+ * 
+ * @param a Pointeur vers le premier nœud.
+ * @param b Pointeur vers le second nœud.
+ */
 static void swap(quadnode **a, quadnode **b) {
+    // Échange les deux pointeurs de nœuds
     quadnode *temp = *a;
     *a = *b;
     *b = temp;
 }
 
+/**
+ * @brief Crée un tas max avec une capacité donnée.
+ * 
+ * @param capacity La capacité maximale du tas.
+ * @return Un pointeur vers le tas max créé.
+ */
 max_heap* create_max_heap(int capacity) {
+    // Alloue de la mémoire pour le tas
     max_heap *heap = malloc(sizeof(max_heap));
     heap->size = 0;
     heap->capacity = capacity;
+    // Alloue de la mémoire pour les nœuds du tas
     heap->nodes = malloc(capacity * sizeof(quadnode *));
     return heap;
 }
 
+/**
+ * @brief Insère un nœud dans le tas max.
+ * 
+ * @param heap Un pointeur vers le tas max.
+ * @param node Un pointeur vers le nœud à insérer.
+ */
 void insert_max_heap(max_heap *heap, quadnode *node) {
     // Double la capacité du tas si nécessaire
     if (heap->size == heap->capacity) {
@@ -36,6 +70,12 @@ void insert_max_heap(max_heap *heap, quadnode *node) {
     }
 }
 
+/**
+ * @brief Extrait le nœud avec la valeur maximale du tas max.
+ * 
+ * @param heap Un pointeur vers le tas max.
+ * @return Un pointeur vers le nœud extrait.
+ */
 quadnode* extract_max(max_heap *heap) {
     if (heap->size == 0) {
         return NULL;
@@ -73,6 +113,11 @@ quadnode* extract_max(max_heap *heap) {
     return max;
 }
 
+/**
+ * @brief Libère la mémoire allouée pour le tas max.
+ * 
+ * @param heap Un pointeur vers le tas max à libérer.
+ */
 void free_max_heap(max_heap *heap) {
     free(heap->nodes);
     free(heap);

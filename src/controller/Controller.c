@@ -1,9 +1,29 @@
+/**
+ * @file Controller.c
+ * @brief Implémentation des fonctions pour le contrôleur gérant les opérations sur les images et les quadtree.
+ * 
+ * Ce fichier contient les fonctions pour le traitement des images et les opérations sur les quadtree, 
+ * telles que la création, la subdivision, la minimisation et la sauvegarde des quadtree.
+ * 
+ * @auteurs 
+ * Mickaël Rakotoarison 
+ * Romain Buges
+ * @date 2024
+ */
+
 #include "../../include/controller/Controller.h"
 #include "../../include/view/View.h"
 #include "../../include/model/Heap.h"
 #include <stdio.h>
 #include <unistd.h>
 
+/**
+ * @brief Traite une image et génère un quadtree.
+ * 
+ * @param image L'image à traiter.
+ * @param useCircles Indique si des cercles doivent être utilisés pour dessiner les nœuds.
+ * @return Pointeur vers le quadtree généré.
+ */
 quadnode *process_image(MLV_Image *image, int useCircles) {
     // Création d'un tas max
     max_heap *heap = create_max_heap(1000);
@@ -27,11 +47,17 @@ quadnode *process_image(MLV_Image *image, int useCircles) {
             sleep(1);
         }
     }
-    // Libération du tas max
     free_max_heap(heap);
     return tree;
 }
 
+/**
+ * @brief Charge un quadtree ou une image à partir d'un chemin de fichier.
+ * 
+ * @param pathInput Chemin d'accès du fichier à charger.
+ * @param image Pointeur vers l'image à mettre à jour.
+ * @param tree Pointeur vers le quadtree à mettre à jour.
+ */
 void load_tree(char **pathInput, MLV_Image **image, quadnode **tree) {
     // Boîte de dialogue pour entrer un chemin de fichier valide
     MLV_wait_input_box(0, 512, 512, 100, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, "   Entrez un chemin valide : ", pathInput);
@@ -55,6 +81,15 @@ void load_tree(char **pathInput, MLV_Image **image, quadnode **tree) {
     }
 }
 
+/**
+ * @brief Gère les clics sur les boutons de l'interface.
+ * 
+ * @param buttonIndex Index du bouton cliqué.
+ * @param image Pointeur vers l'image à traiter.
+ * @param tree Pointeur vers le quadtree.
+ * @param useCircles Indique si des cercles doivent être utilisés pour dessiner les nœuds.
+ * @param pathInput Chemin d'accès pour charger/sauvegarder les fichiers.
+ */
 void handle_button_click(int buttonIndex, MLV_Image **image, quadnode **tree, int useCircles, char **pathInput) {
     // Gère les clics sur les boutons de l'interface
     switch (buttonIndex) {
@@ -82,6 +117,13 @@ void handle_button_click(int buttonIndex, MLV_Image **image, quadnode **tree, in
     }
 }
 
+/**
+ * @brief Boucle principale de l'application.
+ * 
+ * @param image Pointeur vers l'image à traiter.
+ * @param tree Pointeur vers le quadtree.
+ * @param useCircles Indique si des cercles doivent être utilisés pour dessiner les nœuds.
+ */
 void main_loop(MLV_Image *image, quadnode *tree, int useCircles) {
     int clickX, clickY;
     int buttonIndex = -1;
