@@ -5,21 +5,20 @@
 #include <unistd.h>
 
 quadnode *process_image(MLV_Image *image, int useCircles) {
-    // Créer le tas max
+    // Création d'un tas max
     max_heap *heap = create_max_heap(1000);
-
-    // Créer l'arbre quadtree
+    // Création de la racine de l'arbre quadtree
     quadnode *tree = create_quadnode(image, 0, 0, 512, heap);
     int multiple = 1;
 
-    // Boucle pour subdiviser l'image en fonction de l'erreur maximale
+    // Boucle pour subdiviser les noeuds
     for (int i = 0; i < 10000; i++) {
         quadnode *max_error_node = extract_max(heap);
+        // Vérifie si le noeud a une taille supérieure à 1 pour continuer la subdivision
         if (max_error_node && max_error_node->size > 1) {
             subdivide_quadnode(max_error_node, image, heap);
         }
-
-        // Affiche l'arbre quadtree à des intervalles exponentiels
+        // Mise à jour et affichage de l'arbre à des intervalles exponentiels
         if (multiple == i) {
             multiple *= 2;
             MLV_draw_filled_rectangle(0, 0, 512, 512, MLV_COLOR_WHITE);
@@ -28,8 +27,107 @@ quadnode *process_image(MLV_Image *image, int useCircles) {
             sleep(1);
         }
     }
-
-    // Libère le tas max
+    // Libération du tas max
     free_max_heap(heap);
     return tree;
+}
+
+void save_quadtree_unminimized_bw(quadnode *tree) {
+    // Sauvegarde du quadtree non minimisé en noir et blanc
+    save_unminimized_quadtree(tree, "resources/save/result.qtn", 1);
+}
+
+void save_quadtree_unminimized_color(quadnode *tree) {
+    // Sauvegarde du quadtree non minimisé en couleur
+    save_unminimized_quadtree(tree, "resources/save/result.qtc", 0);
+}
+
+void minimize_and_save_quadtree_bw(quadnode *tree) {
+    // Minimisation et sauvegarde du quadtree en noir et blanc
+    minimise_quadtree(tree);
+    save_minimized_quadtree(tree, "resources/save/result.gmn", 1);
+}
+
+void minimize_and_save_quadtree_color(quadnode *tree) {
+    // Minimisation et sauvegarde du quadtree en couleur
+    minimise_quadtree(tree);
+    save_minimized_quadtree(tree, "resources/save/result.gmc", 0);
+}
+
+void load_tree(char **pathInput, MLV_Image **image, quadnode **tree) {
+    // Boîte de dialogue pour entrer un chemin de fichier valide
+    MLV_wait_input_box(0, 512, 512, 100, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_LIGHTGRAY, "   Entrez un chemin valide : ", pathInput);
+    if (!MLV_path_is_a_file(*pathInput)) return; // Vérifie si le chemin est valide
+    free_quadnode(*tree);
+    int length = strlen(*pathInput);
+
+    // Charge le quadtree en fonction de l'extension du fichier
+    if (strncmp(*pathInput + length - 4, ".qtc", 4) == 0)
+        *tree = load_unminimized_quadtree(*pathInput, 0);
+    else if (strncmp(*pathInput + length - 4, ".qtn", 4) == 0)
+        *tree = load_unminimized_quadtree(*pathInput, 1);
+    else if (strncmp(*pathInput + length - 4, ".gmc", 4) == 0)
+        *tree = load_minimized_quadtree(*pathInput, 0);
+    else if (strncmp(*pathInput + length - 4, ".gmn", 4) == 0)
+        *tree = load_minimized_quadtree(*pathInput, 1);
+    else {
+        *tree = NULL;
+        MLV_free_image(*image);
+        *image = load_image(*pathInput);
+    }
+}
+
+void handle_button_click(int buttonIndex, MLV_Image **image, quadnode **tree, int useCircles, char **pathInput) {
+    // Gère les clics sur les boutons de l'interface
+    switch (buttonIndex) {
+        case 0:
+            *tree = process_image(*image, useCircles);
+            break;
+        case 1:
+            save_quadtree_unminimized_bw(*tree);
+            break;
+        case 2:
+            save_quadtree_unminimized_color(*tree);
+            break;
+        case 3:
+            minimise_quadtree(*tree);
+            break;
+        case 4:
+            load_tree(pathInput, image, tree);
+            break;
+        case 5:
+            minimize_and_save_quadtree_bw(*tree);
+            break;
+        case 6:
+            minimize_and_save_quadtree_color(*tree);
+            break;
+    }
+}
+
+void main_loop(MLV_Image *image, quadnode *tree, int useCircles) {
+    int clickX, clickY;
+    int buttonIndex = -1;
+    char *pathInput = "";
+
+    // Boucle principale de l'application
+    while (buttonIndex != 7) {
+        draw_interface_buttons();
+        if (tree != NULL) draw_quadtree(tree, useCircles);
+        else draw_image(image);
+        update_window();
+
+        // Attente du clic de souris
+        MLV_wait_mouse(&clickX, &clickY);
+        hide_buttons();
+
+        // Calcul de l'index du bouton cliqué
+        buttonIndex = clickX / 128 + 4 * ((clickY - 512) / 50);
+        if (buttonIndex != 0 && buttonIndex != 4 && tree == NULL) continue;
+        
+        // Gestion du clic sur le bouton
+        handle_button_click(buttonIndex, &image, &tree, useCircles, &pathInput);
+    }
+
+    // Libération des ressources
+    free_quadnode(tree);
 }
