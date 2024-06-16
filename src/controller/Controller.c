@@ -4,16 +4,14 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void process_image(const char *filename) {
-    initialize_window();
-    MLV_Image *image = MLV_load_image(filename);
-    if (!image) {
-        fprintf(stderr, "Could not load image %s\n", filename);
-        return;
-    }
 
-    max_heap *heap = create_max_heap(10);
+quadnode *process_image(MLV_Image *image) {
+    // Créer le tas max
+    max_heap *heap = create_max_heap(1000);
+
+    // Créer l'arbre quadtree
     quadnode *tree = create_quadnode(image, 0, 0, 512, heap);
+
 
     for (int i = 0; i < 100; i++) {
         quadnode *max_error_node = extract_max(heap);
@@ -33,9 +31,9 @@ void process_image(const char *filename) {
     heap = create_max_heap(100);
     quadnode *loaded_tree;
     if (isMinimized) {
-        loaded_tree = load_minimised_quadtree(isBW ? "result_minimized.qtn" : "result_minimized.qtc", heap, isBW);
+        loaded_tree = load_minimised_quadtree(isBW ? "result_minimized.qtn" : "result_minimized.qtc", isBW);
     } else {
-        loaded_tree = load_quadtree(isBW ? "result.qtn" : "result.qtc", heap, isBW);
+        loaded_tree = load_quadtree(isBW ? "result.qtn" : "result.qtc", isBW);
     }
 
     if (loaded_tree) {
@@ -45,8 +43,7 @@ void process_image(const char *filename) {
         free_quadnode(loaded_tree);
     }
 
+
     free_max_heap(heap);
-    free_quadnode(tree);
-    MLV_free_image(image);
-    free_window();
+    return tree;
 }
